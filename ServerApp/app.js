@@ -34,6 +34,7 @@ var productSchema = new mongoose.Schema({
 var UserDetail = module.exports = mongoose.model('taiKhoans',accountSchema);
 var ProductDetail = module.exports = mongoose.model('products',productSchema);
 
+//đăng nhập app
 app.post('/login',function(req,res){
 	UserDetail.findOne({'name': req.body.name}, function(err, data){
 		if (err) {
@@ -53,6 +54,7 @@ app.post('/login',function(req,res){
 	});
 });
 
+//đăng kí tài khoản
 app.post('/register',function(req,res){
 	UserDetail.findOne({'name': req.body.name}, function(err, data){
 		if (err) {
@@ -73,6 +75,7 @@ app.post('/register',function(req,res){
 	});
 });
 
+//tạo sản phẩm
 app.post('/createProduct',function(req,res){
 	var product = ProductDetail(req.body);
 	product.save(function (err,data) {
@@ -83,23 +86,36 @@ app.post('/createProduct',function(req,res){
 	})
 });
 
-app.post('/updateProduct/:id', function(req, res) {
-    ProductDetail.update({_id: req.params.id}, req.body, function (err, result) {
+//edit sản phẩm
+app.put('/updateProduct/:id', function(req, res) {
+    ProductDetail.update({_id: req.params.id}, req.body, function (err) {
            	if (err) {
     			res.end(JSON.stringify(new ResultData(null,false,'server err')));
     		}else{
-       			 res.end(JSON.stringify(new ResultData(result,true,'')));
+       			 res.end(JSON.stringify(new ResultData(null,true,'')));
     		}
     });
 });
 
+//delete sản phẩm
+app.delete('/deleteProduct/:id', function(req, res){
+  	ProductDetail.remove({_id:req.params.id}, function(err){
+        if(err){
+          	res.end(JSON.stringify(new ResultData(null,false,'server err')));
+        }else{
+        	res.end(JSON.stringify(new ResultData(null,true,'')));
+        }
+    });
+});
+
+
+//get all sản phẩm theo creator
 app.get('/allProduct/:creator',function(req,res){
 		ProductDetail.find({'creator' : req.params.creator},function(err,data){
 		if (err) {
 			throw err;
 		}
-		res.end(JSON.stringify(new ResultData(data,true,'')));
-	});
+		res.end(JSON.stringify(new ResultData(data,true,'')));});
 });
 
 function ResultData(results,success,error){
@@ -110,7 +126,6 @@ function ResultData(results,success,error){
 
 var options = {
   inflate: true,
-  // limit: '1000kb',
   type: 'application/json'
 };
 
